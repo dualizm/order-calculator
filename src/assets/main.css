@@ -1,0 +1,33 @@
+@import './base.css';
+
+a,
+.green {
+  text-decoration: none;
+  color: var(----color-accent);
+  transition: 0.4s;
+  padding: 3px;
+}
+
+button {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: none;
+  transition: all 1s;
+  cursor: pointer;
+  background-color: var(--color-background-soft);
+  padding: 10px;
+  border-radius: 100%;
+}
+
+button:hover {
+  background-color: var(--color-background-mute);
+}
+
+input {
+  background-color: black;
+  color: var(--color-text);
+  padding: 10px;
+  border-radius: 10px;
+  border: 2px solid var(--color-border);
+}
