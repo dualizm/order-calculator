@@ -36,7 +36,7 @@ import OrderList from './OrderList.vue'
       <div class="info">
         <label>Переводить на</label>
         <input v-model="targetMoney" type="text" placeholder="Банк, телефон..." />
-        <label>Сумма заказа: {{ totalSum }}</label>
+        <p>Сумма заказа: {{ totalSum }}</p>
       </div>
     </section>
   </main>
@@ -64,6 +64,11 @@ export default {
     },
 
     calculateTotal() {
+      if (this.orders.length === 0) {
+        this.totalSum = 0
+        return
+      }
+
       const sum = this.orders
         .map((order) => order.prices)
         .flat()
@@ -85,8 +90,15 @@ export default {
     copyToBuffer() {
       const formatPrices = (prices) =>
         prices.map((v) => v - this.calculateDiscount(v, this.discount)).join(' + ')
-      const formatTotal = (prices) => prices.reduce((a, b) => a + b, 0) - this.calculateDiscount(prices.reduce((a, b) => a + b, 0), this.discount) + this.serviceFeeOnPerson()
-      const formatServiceFee = () => this.serviceFee !== 0 ? ` + ${this.serviceFeeOnPerson()}` : ``
+      const formatTotal = (prices) =>
+        prices.reduce((a, b) => a + b, 0) -
+        this.calculateDiscount(
+          prices.reduce((a, b) => a + b, 0),
+          this.discount
+        ) +
+        this.serviceFeeOnPerson()
+      const formatServiceFee = () =>
+        this.serviceFee !== 0 ? ` + ${this.serviceFeeOnPerson()}` : ``
 
       navigator?.clipboard.writeText(
         [
