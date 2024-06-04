@@ -19,22 +19,22 @@ export default {
   data() {
     return {
       localPrices: this.modelValue
-    };
+    }
   },
   computed: {
     hasInvalidPrices() {
-      return this.localPrices.split(',').some(price => isNaN(Number(price)));
+      return this.localPrices.split(';').some((price) => isNaN(price))
     }
   },
   watch: {
     localPrices(newVal) {
-      this.$emit('update:modelValue', newVal);
+      this.$emit('update:modelValue', newVal)
     },
     modelValue(newVal) {
-      this.localPrices = newVal;
+      this.localPrices = newVal
     }
   }
-};
+}
 </script>
 
 <style scoped>

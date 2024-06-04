@@ -4,9 +4,9 @@ import OrderListItem from './OrderListItem.vue'
 
 <template>
   <transition-group name="orders">
-    <ul class="order-list">
+    <ul class="order-list" key="orders">
       <order-list-item
-        v-for="order in orders" 
+        v-for="order in orders"
         :key="order.id"
         :order="order"
         :serviceFeeOnPerson="serviceFeeOnPerson"
@@ -25,12 +25,11 @@ export default {
       required: true
     },
     serviceFeeOnPerson: {
-      type: Number,
       required: true
     }
   },
 
-  emits: ['deleteOrder', 'updateOrder'],
+  emits: ['deleteOrder', 'updateOrder']
 }
 </script>
 
@@ -60,5 +59,4 @@ export default {
   width: 100%;
   position: relative;
 }
-
 </style>

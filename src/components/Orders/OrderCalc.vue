@@ -2,6 +2,7 @@
 import CopyIcon from '../icons/CopyIcon.vue'
 import OrderForm from './OrderForm.vue'
 import OrderList from './OrderList.vue'
+import { RUB } from '../utils/RUB.js'
 </script>
 
 <template>
@@ -11,6 +12,8 @@ import OrderList from './OrderList.vue'
       <div class="info">
         <label>Скидка на заказ:</label>
         <input v-model.number="discount" type="text" placeholder="Скидка на заказ" />
+        <label>Стоимость доставки:</label>
+        <input v-model.number="deliveryPrice" type="text" placeholder="Стоимость доставки" />
         <label>Сервисный сбор:</label>
         <input v-model.number="serviceFee" type="text" placeholder="Сервисный сбор" />
       </div>
@@ -49,34 +52,37 @@ export default {
     return {
       orders: [],
       discount: 0,
-      serviceFee: 0,
-      totalSum: 0,
+      deliveryPrice: RUB(0),
+      serviceFee: RUB(0),
+      totalSum: RUB(0),
       targetMoney: ''
     }
   },
 
   methods: {
     serviceFeeOnPerson() {
-      return this.serviceFee / (this.orders.length || 1)
+      return RUB(this.serviceFee)
+        .add(this.deliveryPrice)
+        .divide(this.orders.length || 1)
     },
 
     calculateDiscount(value, percent) {
-      return value * (percent / 100)
+      return value.multiply(percent / 100)
     },
 
     calculateTotal() {
       if (this.orders.length === 0) {
-        this.totalSum = 0
+        this.totalSum = RUB(0)
         return
       }
 
       const sum = this.orders
         .map((order) => order.prices)
         .flat()
-        .reduce((a, b) => a + b, 0)
+        .reduce((a, b) => a.add(b), RUB(0))
 
       const discountAmount = this.calculateDiscount(sum, this.discount)
-      this.totalSum = sum - discountAmount + Number(this.serviceFee)
+      this.totalSum = sum.subtract(discountAmount).add(this.serviceFee).add(this.deliveryPrice)
     },
 
     createOrder(order) {
@@ -90,31 +96,43 @@ export default {
 
     copyToBuffer() {
       const formatPrices = (prices) =>
-        prices.map((v) => v - this.calculateDiscount(v, this.discount)).join(' + ')
+        prices
+          .map((v) =>
+            RUB(v)
+              .subtract(this.calculateDiscount(RUB(v), this.discount))
+              .format()
+          )
+          .join(' + ')
+
       const formatTotal = (prices) =>
-        prices.reduce((a, b) => a + b, 0) -
-        this.calculateDiscount(
-          prices.reduce((a, b) => a + b, 0),
-          this.discount
-        ) +
-        this.serviceFeeOnPerson()
+        prices
+          .reduce((a, b) => a.add(b), RUB(0))
+          .subtract(
+            this.calculateDiscount(
+              prices.reduce((a, b) => a.add(b), RUB(0)),
+              this.discount
+            )
+          )
+          .add(this.serviceFeeOnPerson())
+          .format()
+
       const formatServiceFee = () =>
-        this.serviceFee !== 0 ? ` + ${this.serviceFeeOnPerson()}` : ``
+        this.serviceFee.value !== 0 ? ` + ${this.serviceFeeOnPerson().format()}` : ``
 
       navigator?.clipboard.writeText(
         [
-          `Сервисный сбор: ${this.serviceFee}`,
+          `Стоимость доставки: ${RUB(this.deliveryPrice).format()}`,
+          `Сервисный сбор: ${RUB(this.serviceFee).format()}`,
           `Скидка на заказ: ${this.discount}%`,
-          `Заказы:`,
+          'Заказы\n',
           `${this.orders
             .map(
               (order) =>
                 `${order.name}: ${formatPrices(order.prices) + formatServiceFee()} = ${formatTotal(order.prices)}`
             )
             .join('\n')}`,
-          '',
           `Отправить деньги на: ${this.targetMoney}`,
-          `Итого: ${this.totalSum}`
+          `Итого: ${this.totalSum.format()}`,
         ].join('\n')
       )
     },
@@ -140,6 +158,10 @@ export default {
     },
 
     discount() {
+      this.calculateTotal()
+    },
+
+    deliveryPrice() {
       this.calculateTotal()
     }
   }

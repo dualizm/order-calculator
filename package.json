@@ -12,6 +12,7 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "currency.js": "^2.0.4",
     "vue": "^3.4.21"
   },
   "devDependencies": {

@@ -4,6 +4,7 @@ import EditIcon from '../icons/EditIcon.vue'
 import BackArrowIcon from '../icons/BackArrowIcon.vue'
 import ConfirmIcon from '../icons/ConfirmIcon.vue'
 import PricesInput from '../ui/PricesInput.vue'
+import { RUB } from '../utils/RUB.js'
 </script>
 
 <template>
@@ -18,16 +19,21 @@ import PricesInput from '../ui/PricesInput.vue'
         <confirm-icon class="confirm-icon" @click="updateOrder" />
       </template>
     </div>
-    <template v-if="!isEdit">
-      <p>{{ order.name }}: {{ order.prices.join(', ') }}</p>
-    </template>
-    <template v-else>
-      <div class="edit-inputs">
-        <input v-model="name" placeholder="Имя" type="text" />
-        <prices-input v-model="prices" />
-      </div>
-    </template>
-    <span class="tag">{{ serviceFeeOnPerson }}</span>
+    <div class="info">
+      <template v-if="!isEdit">
+        <p>
+          <span class="order-name">{{ order.name }}</span
+          >: {{ order.prices.map((price) => RUB(price).format()).join('; ') }}
+        </p>
+      </template>
+      <template v-else>
+        <div class="edit-inputs">
+          <input v-model="name" placeholder="Имя" type="text" />
+          <prices-input v-model="prices" />
+        </div>
+      </template>
+    </div>
+    <span class="tag">{{ serviceFeeOnPerson.format() }}</span>
   </li>
 </template>
 
@@ -37,7 +43,7 @@ export default {
     return {
       isEdit: false,
       name: this.order.name,
-      prices: this.order.prices.toString()
+      prices: this.order.prices.join(';')
     }
   },
 
@@ -47,7 +53,7 @@ export default {
       required: true
     },
     serviceFeeOnPerson: {
-      type: Number,
+      type: Object,
       required: true
     }
   },
@@ -58,26 +64,28 @@ export default {
       this.$emit('updateOrder', {
         id: this.order.id,
         name: this.name,
-        prices: this.prices.split(',').map(price => parseFloat(price.trim()))
+        prices: this.prices
+          .split(';')
+          .map((price) => parseFloat(price.trim()))
+          .map((price) => RUB(price))
       })
     }
   },
 
-  emits: ['deleteOrder', 'updateOrder'],
+  emits: ['deleteOrder', 'updateOrder']
 }
 </script>
 
-<style>
+<style scoped>
 .order-list-item {
   list-style: none;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-  border-radius: 10px;
-  padding: 20px;
-  border: 2px solid var(--color-border);
   position: relative;
+}
+
+.order-name {
+  font-weight: 600;
+  font-size: 15px;
 }
 
 .tag {
@@ -91,15 +99,24 @@ export default {
   transform: translateY(-50%);
 }
 
+.info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 2px solid var(--color-border);
+  border-radius: 10px;
+  padding: 10px;
+  height: 70px;
+  flex: 1;
+}
+
 .control-panel {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 5px;
-  position: absolute;
-  top: 6%;
-  left: -7%;
-  z-index: 1;
+  width: 50px;
 }
 
 .close-icon {
@@ -115,7 +132,7 @@ export default {
   transition: 1s all;
 }
 
-.edit-icon:hover path {
+.edit-icon:hover {
   fill: var(--color-accent);
   transition: 1s all;
 }
@@ -124,7 +141,7 @@ export default {
   cursor: pointer;
 }
 
-.confirm-icon:hover path {
+.confirm-icon:hover {
   fill: var(--color-accent);
   transition: 1s all;
 }
@@ -133,14 +150,14 @@ export default {
   cursor: pointer;
 }
 
-.back-arrow-icon:hover path {
+.back-arrow-icon:hover {
   fill: var(--color-red);
   transition: 1s all;
 }
 
 .edit-inputs {
   display: flex;
-  align-items: left;
-  gap: 15px;
+  width: 100%;
+  gap: 10px;
 }
 </style>
