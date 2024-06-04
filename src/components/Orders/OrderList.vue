@@ -4,11 +4,14 @@ import OrderListItem from './OrderListItem.vue'
 
 <template>
   <transition-group name="orders">
-    <ul class="order-list" v-for="order in orders" :key="order.id">
+    <ul class="order-list">
       <order-list-item
+        v-for="order in orders" 
+        :key="order.id"
         :order="order"
         :serviceFeeOnPerson="serviceFeeOnPerson"
         @deleteOrder="$emit('deleteOrder', order.id)"
+        @updateOrder="$emit('updateOrder', $event)"
       />
     </ul>
   </transition-group>
@@ -26,6 +29,8 @@ export default {
       required: true
     }
   },
+
+  emits: ['deleteOrder', 'updateOrder'],
 }
 </script>
 

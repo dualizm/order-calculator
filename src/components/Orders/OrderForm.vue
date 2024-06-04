@@ -1,18 +1,17 @@
 <script setup>
 import AddIcon from '../icons/AddIcon.vue'
+import PricesInput from '../ui/PricesInput.vue'
 </script>
 
 <template>
   <form @submit.prevent>
-    <input 
-        v-model="name" 
-        placeholder="Имя" 
-        type="text" 
-    />
     <input
+      v-model.trim="name" 
+      placeholder="Имя" 
+      type="text" 
+    />
+    <prices-input
       v-model="prices"
-      placeholder="Цены"
-      type="text"
     />
     <button title="Добавить" @click="createOrder">
       <AddIcon />
@@ -25,16 +24,19 @@ export default {
   data() {
     return {
       name: '',
-      prices: []
+      prices: '',
     }
   },
   methods: {
     createOrder() {
         if (!this.name || !this.prices) return
 
+        const prices = this.prices.split(',').some(price => isNaN(Number(price)))
+        if(prices) return
+
         this.$emit('createOrder', {
             name: this.name,
-            prices: this.prices.split(' ').map(Number)
+            prices: this.prices.split(',').map(Number)
         })
         this.name = ''
         this.prices = ''

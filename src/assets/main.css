@@ -31,3 +31,7 @@ input {
   border-radius: 10px;
   border: 2px solid var(--color-border);
 }
+
+input:focus {
+  outline: none;
+}

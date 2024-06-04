@@ -25,6 +25,7 @@ import OrderList from './OrderList.vue'
         :orders="orders"
         :serviceFeeOnPerson="serviceFeeOnPerson()"
         @deleteOrder="deleteOrder"
+        @updateOrder="updateOrder"
       />
     </section>
 
@@ -122,6 +123,14 @@ export default {
       this.orders = this.orders.filter((order) => order.id !== id)
 
       this.calculateTotal()
+    },
+
+    updateOrder(updatedOrder) {
+      const index = this.orders.findIndex((order) => order.id === updatedOrder.id)
+      if (index !== -1) {
+        this.orders.splice(index, 1, updatedOrder)
+        this.calculateTotal()
+      }
     }
   },
 

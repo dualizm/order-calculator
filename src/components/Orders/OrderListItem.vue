@@ -1,18 +1,32 @@
 <script setup>
 import CloseIcon from '../icons/CloseIcon.vue'
 import EditIcon from '../icons/EditIcon.vue'
+import BackArrowIcon from '../icons/BackArrowIcon.vue'
+import ConfirmIcon from '../icons/ConfirmIcon.vue'
+import PricesInput from '../ui/PricesInput.vue'
 </script>
 
 <template>
-  <li class="order-list-item">
+  <li class="order-list-item" :key="order.id">
     <div class="control-panel">
-      <close-icon class="close-icon" @click="$emit('deleteOrder', order.id)" />
-      <edit-icon class="edit-icon" v-on:click="isEdit=!isEdit" />
+      <template v-if="!isEdit">
+        <close-icon class="close-icon" @click="$emit('deleteOrder', order.id)" />
+        <edit-icon class="edit-icon" @click="isEdit = !isEdit" />
+      </template>
+      <template v-else>
+        <back-arrow-icon class="back-arrow-icon" @click="isEdit = !isEdit" />
+        <confirm-icon class="confirm-icon" @click="updateOrder" />
+      </template>
     </div>
     <template v-if="!isEdit">
-      <p>{{ order.name }}: {{ order.prices.join(' + ') }}</p>
+      <p>{{ order.name }}: {{ order.prices.join(', ') }}</p>
     </template>
-    <template v-else>Editing...</template>
+    <template v-else>
+      <div class="edit-inputs">
+        <input v-model="name" placeholder="Имя" type="text" />
+        <prices-input v-model="prices" />
+      </div>
+    </template>
     <span class="tag">{{ serviceFeeOnPerson }}</span>
   </li>
 </template>
@@ -22,6 +36,8 @@ export default {
   data() {
     return {
       isEdit: false,
+      name: this.order.name,
+      prices: this.order.prices.toString()
     }
   },
 
@@ -35,6 +51,19 @@ export default {
       required: true
     }
   },
+
+  methods: {
+    updateOrder() {
+      this.isEdit = !this.isEdit
+      this.$emit('updateOrder', {
+        id: this.order.id,
+        name: this.name,
+        prices: this.prices.split(',').map(price => parseFloat(price.trim()))
+      })
+    }
+  },
+
+  emits: ['deleteOrder', 'updateOrder'],
 }
 </script>
 
@@ -91,4 +120,27 @@ export default {
   transition: 1s all;
 }
 
+.confirm-icon {
+  cursor: pointer;
+}
+
+.confirm-icon:hover path {
+  fill: var(--color-accent);
+  transition: 1s all;
+}
+
+.back-arrow-icon {
+  cursor: pointer;
+}
+
+.back-arrow-icon:hover path {
+  fill: var(--color-red);
+  transition: 1s all;
+}
+
+.edit-inputs {
+  display: flex;
+  align-items: left;
+  gap: 15px;
+}
 </style>
