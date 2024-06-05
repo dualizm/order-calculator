@@ -1,9 +1,12 @@
 @import './base.css';
 
+* {
+  color: var(--color-text);
+}
+
 a,
 .green {
   text-decoration: none;
-  color: var(----color-accent);
   transition: 0.4s;
   padding: 3px;
 }
@@ -26,7 +29,6 @@ button:hover {
 
 input {
   background-color: black;
-  color: var(--color-text);
   padding: 10px;
   border-radius: 10px;
   border: 2px solid var(--color-border);

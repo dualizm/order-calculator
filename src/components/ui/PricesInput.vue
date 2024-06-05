@@ -1,7 +1,7 @@
 <template>
   <input
     v-model.trim="localPrices"
-    placeholder="Цены"
+    placeholder="Цены 20;30.5;40"
     type="text"
     :class="{ 'invalid-prices': hasInvalidPrices }"
   />

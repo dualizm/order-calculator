@@ -6,7 +6,7 @@ import { RUB } from '../utils/RUB.js'
 
 <template>
   <form @submit.prevent>
-    <input v-model.trim="name" placeholder="Имя" type="text" />
+    <input ref="name-input" v-model.trim="name" placeholder="Имя" type="text" />
     <prices-input v-model="prices" />
     <button title="Добавить" @click="createOrder">
       <AddIcon />
@@ -35,6 +35,8 @@ export default {
       })
       this.name = ''
       this.prices = ''
+
+      this.$refs['name-input'].focus()
     }
   }
 }
